@@ -1,11 +1,15 @@
+import {generateCode} from "./utils";
+
 /**
  * Хранилище состояния приложения
  */
 class Store {
   constructor(initState = {}) {
-    this.state = initState;
+    this.state = {
+      ...initState,
+        cart: []
+      };
     this.listeners = []; // Слушатели изменений состояния
-    this.state.number = Math.max(...this.state.list.map(item => item.code));
   }
 
   /**
@@ -39,67 +43,63 @@ class Store {
     for (const listener of this.listeners) listener();
   }
 
-  /**
-   * Добавление новой записи
-   */
-  addItem() {
-    this.setState({
-      ...this.state,
-      number: this.state.number += 1,
-      list: [...this.state.list, {code: this.state.number, title: 'Новая запись'}]
-    })
-  };
-
-  /**
-   * Удаление записи по коду
-   * @param code
-   */
-  deleteItem(code) {
-    this.setState({
-      ...this.state,
-      list: this.state.list.filter(item => item.code !== code)
-    })
-  };
-
-  /**
-   * Выделение записи по коду
-   * @param code
-   */
-  selectItem(code) {
-    this.setState({
-      ...this.state,
-      list: this.state.list.map(item => {
-        if (item.code === code) {
-          item.selected = !item.selected;
-          if (item.selected) {
-            item.amount ? item.amount++ : item.amount = 1
-          }
-        } else if (item.code !== code) {
-          item.selected = false;
-        }
-
-        if (item.amount) {
-          let bignum = item.amount % 100;
-          
-          if (bignum > 19) {
-            bignum = bignum % 10;
-          }
-
-          switch (bignum) {
-            case 2:
-            case 3:
-            case 4:
-              item.word = 'раза'
-              break;
-            default:
-              item.word = 'раз'
-          }
-        }
-
-        return item;
-      })
-    })
+  calculateTotal() {
+    let total = 0;
+    this.state.cart.forEach(item => {
+      total += item.price * item.quantity;
+    });
+    return total;
   }
+
+  updateTotal() {
+    const total = this.calculateTotal();
+
+    this.setState({
+      ...this.state,
+      total: total
+    });
+
+  }
+
+  addToCart(code) {
+    const selectedProduct = this.state.list.find(item => item.code === code);
+    if (selectedProduct) {
+      const cartItem = this.state.cart.find(item => item.code === code);
+      if (cartItem) {
+        this.setState({
+          ...this.state,
+          cart: this.state.cart.map(item => {
+            if (item.code === code) {
+              return {
+                ...item,
+                quantity: item.quantity + 1
+              };
+            }
+            return item;
+          })
+        });
+      } else {
+        const newCartItem = {
+          ...selectedProduct,
+          quantity: 1
+        };
+        this.setState({
+          ...this.state,
+          cart: [...this.state.cart, newCartItem]
+        });
+      }
+      this.updateTotal()
+    }
+  }
+
+  removeFromCart(code) {
+    this.setState({
+      ...this.state,
+      cart: this.state.cart.filter(item => item.code !== code)
+    })
+    this.updateTotal()
+  }
+
 }
 
 export default Store;

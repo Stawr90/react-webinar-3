@@ -1,44 +1,51 @@
-import React from 'react';
-import {createElement} from './utils.js';
-import './styles.css';
+import React, {useCallback, useState} from 'react';
+import List from "./components/list";
+import Controls from "./components/controls";
+import Head from "./components/head";
+import PageLayout from "./components/page-layout";
+import Basket from './components/basket';
 
 /**
  * Приложение
  * @param store {Store} Хранилище состояния приложения
  * @returns {React.ReactElement}
  */
-function App({store}) {
+function App({ store }) {
+  const [basket, setBasket] = useState(false);
+  const { list, cart, total } = store.getState();
 
-  const list = store.getState().list;
+  const callbacks = {
+    onAddToCart: useCallback((code) => {
+      store.addToCart(code);
+    }, [store]),
 
+    onRemoveFromCart: useCallback((code) => {
+      store.removeFromCart(code);
+    }, [store])
+  }
+  
   return (
-    <div className='App'>
-      <div className='App-head'>
-        <h1>Приложение на чистом JS</h1>
-      </div>
-      <div className='App-controls'>
-        <button onClick={() => store.addItem()}>Добавить</button>
-      </div>
-      <div className='App-center'>
-        <div className='List'>{
-          list.map(item =>
-            <div key={item.code} className='List-item'>
-              <div className={'Item' + (item.selected ? ' Item_selected' : '')}
-                   onClick={() => store.selectItem(item.code)}>
-                <div className='Item-code'>{item.code}</div>
-                <div className='Item-title'>{item.title} {item.amount ? `| Выделяли ${item.amount} ${item.word}` : ''}</div>
-                <div className='Item-actions'>
-                  <button onClick={() => store.deleteItem(item.code)}>
-                    Удалить
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
-  );
+    <PageLayout>
+      <Head title='Магазин' />
+      <Controls
+        cart={cart}
+        total={total}
+        basket={basket}
+        setBasket={setBasket}
+      />
+      <List list={list} onAction={callbacks.onAddToCart} buttonText='Добавить' />
+      {
+        basket &&
+        <Basket
+          setBasket={setBasket}
+          basketTitle='Корзина'
+        >
+          <List list={cart} onAction={callbacks.onRemoveFromCart} buttonText='Удалить' />
+          {cart.length > 0 && <p className='Basket-price'>Итого<span>{total.toLocaleString(undefined, { useGrouping: true })} ₽</span></p>}
+        </Basket>
+      }
+    </PageLayout>
+  )
 }
 
 export default App;
