@@ -15,7 +15,7 @@ function App({ store }) {
   const { list, cart, total } = store.getState();
 
   const callbacks = {
-    onAddToCart: useCallback((code) => {
+    onAddToCart: useCallback((code) => {  
       store.addToCart(code);
     }, [store]),
 
@@ -39,9 +39,10 @@ function App({ store }) {
         <Basket
           setBasket={setBasket}
           basketTitle='Корзина'
+          list={cart}
+          total={total}
         >
           <List list={cart} onAction={callbacks.onRemoveFromCart} buttonText='Удалить' />
-          {cart.length > 0 && <p className='Basket-price'>Итого<span>{total.toLocaleString(undefined, { useGrouping: true })} ₽</span></p>}
         </Basket>
       }
     </PageLayout>

@@ -3,7 +3,7 @@ import './style.css';
 import PropTypes from "prop-types";
 import Head from "../head";
 
-function Basket({ setBasket, basketTitle, children }) {
+function Basket({ setBasket, basketTitle, children, list, total }) {
 
   return (
     <div className='Basket'>
@@ -14,6 +14,7 @@ function Basket({ setBasket, basketTitle, children }) {
         <div className="Basket-list">
           {children}
         </div>
+        {list.length > 0 && <p className='Basket-price'>Итого<span>{total.toLocaleString(undefined, { useGrouping: true })} ₽</span></p>}
       </div>
     </div>
   )

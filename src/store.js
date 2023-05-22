@@ -7,7 +7,8 @@ class Store {
   constructor(initState = {}) {
     this.state = {
       ...initState,
-        cart: []
+        cart: [],
+        total: 0
       };
     this.listeners = []; // Слушатели изменений состояния
   }
@@ -43,23 +44,23 @@ class Store {
     for (const listener of this.listeners) listener();
   }
 
-  calculateTotal() {
-    let total = 0;
-    this.state.cart.forEach(item => {
-      total += item.price * item.quantity;
-    });
-    return total;
-  }
+  // calculateTotal() {
+  //   let total = 0;
+  //   this.state.cart.forEach(item => {
+  //     total += item.price * item.quantity;
+  //   });
+  //   return total;
+  // }
 
-  updateTotal() {
-    const total = this.calculateTotal();
+  // updateTotal() {
+  //   const total = this.calculateTotal();
 
-    this.setState({
-      ...this.state,
-      total: total
-    });
+  //   this.setState({
+  //     ...this.state,
+  //     total: total
+  //   });
 
-  }
+  // }
 
   addToCart(code) {
     const selectedProduct = this.state.list.find(item => item.code === code);
@@ -76,6 +77,10 @@ class Store {
               };
             }
             return item;
+          }),
+          total: this.state.cart.forEach(item => {
+            total += item.price * item.quantity;
+            return total;
           })
         });
       } else {
@@ -85,19 +90,25 @@ class Store {
         };
         this.setState({
           ...this.state,
-          cart: [...this.state.cart, newCartItem]
+          cart: [...this.state.cart, newCartItem],
+          total: this.state.cart.forEach(item => {
+            total += item.price * item.quantity;
+            return total;
+          })
         });
       }
-      this.updateTotal()
     }
   }
 
   removeFromCart(code) {
     this.setState({
       ...this.state,
-      cart: this.state.cart.filter(item => item.code !== code)
+      cart: this.state.cart.filter(item => item.code !== code),
+      total: this.state.cart.forEach(item => {
+        total += item.price * item.quantity;
+        return total;
+      })
     })
-    this.updateTotal()
   }
 
 }
