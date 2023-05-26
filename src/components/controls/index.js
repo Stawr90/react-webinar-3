@@ -1,4 +1,4 @@
-import React from "react";
+import {memo} from "react";
 import PropTypes from 'prop-types';
 import { plural } from '../../utils';
 import './style.css';
@@ -28,4 +28,4 @@ Controls.defaultProps = {
   setBasket: () => {}
 }
 
-export default React.memo(Controls);
+export default memo(Controls);

@@ -1,4 +1,4 @@
-import React from "react";
+import {memo} from "react";
 import PropTypes from "prop-types";
 import './style.css';
 
@@ -16,4 +16,4 @@ Head.propTypes = {
   children: PropTypes.node
 };
 
-export default React.memo(Head);
+export default memo(Head);

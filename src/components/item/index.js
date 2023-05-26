@@ -1,30 +1,32 @@
-import React from "react";
+import {memo, useState} from "react";
+import {cn as bem} from '@bem-react/classname';
+import {numberFormat} from "../../utils";
+import {Link} from 'react-router-dom';
+
 import PropTypes from "prop-types";
 
 import './style.css';
 
-function Item({ item, onAction, buttonText }) {
+function Item(props){
+
+  const cn = bem('Item');
 
   const callbacks = {
-    onAction: (event, item) => {
-      event.stopPropagation()
-      onAction(item.code)
+    onAdd: (e) => {
+      e.preventDefault()
+      props.onAdd(props.item._id)
     }
   }
 
   return (
-    <div className='Item'>
-      <div className='Item-container'>
-        <div className='Item-code'>{item.code}</div>
-        <div className='Item-title'>
-          {item.title}
-        </div>
-      </div>
-      <div className='Item-actions'>
-        <p className='Item-price'>
-        {item.price.toLocaleString(undefined, { useGrouping: true })} ₽</p>
-        {buttonText === 'Удалить' && <p className='Item-quantity'>{item.quantity} шт</p>}
-        <button onClick={(event) => callbacks.onAction(event, item)}>{buttonText}</button>
+    <div className={cn()}>
+        <Link to={`/product/${props.item._id}`} className={cn('title')}>
+          {props.item.title}
+        </Link>
+
+      <div className={cn('actions')}>
+        <div className={cn('price')}>{numberFormat(props.item.price)} ₽</div>
+        <button onClick={(e) => callbacks.onAdd(e)}>Добавить</button>
       </div>
     </div>
   );
@@ -32,17 +34,15 @@ function Item({ item, onAction, buttonText }) {
 
 Item.propTypes = {
   item: PropTypes.shape({
-    code: PropTypes.number,
+    _id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     title: PropTypes.string,
-    selected: PropTypes.bool,
-    count: PropTypes.number,
-    quantity: PropTypes.number
+    price: PropTypes.number
   }).isRequired,
-  onAction: PropTypes.func
+  onAdd: PropTypes.func,
 };
 
 Item.defaultProps = {
-  onAction: () => {},
+  onAdd: () => {},
 }
 
-export default React.memo(Item);
+export default memo(Item);
