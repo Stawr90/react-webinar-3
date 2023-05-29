@@ -21,6 +21,10 @@
   color: #000;
 }
 
+.Item-title:hover {
+  text-decoration: underline;
+}
+
 .Item-actions {
   padding: 20px 20px 20px 10px;
   display: flex;
