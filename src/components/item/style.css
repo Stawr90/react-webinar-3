@@ -25,6 +25,16 @@
   text-decoration: underline;
 }
 
+.Item-title a{
+  color: #000;
+  text-decoration: none;
+}
+
+.Item-title a:hover{
+  color: #000;
+  text-decoration: underline;
+}
+
 .Item-actions {
   padding: 20px 20px 20px 10px;
   display: flex;

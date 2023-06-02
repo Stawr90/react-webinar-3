@@ -34,21 +34,33 @@ export function numberFormat(value, locale = 'ru-RU', options = {}) {
   return new Intl.NumberFormat(locale, options).format(value);
 }
 
-export function renderPageNumbers(currentPage, totalPages, onChange) {
-  let pageNumbers = [];
-  if (totalPages > 0 && totalPages < 6) {
-    for (let i = 1; i < totalPages + 1; i++) {
-      pageNumbers.push(i)
+export const createCategoryTree = (items = []) => {
+  const cache = new Map();
+  const firstLineKeys = [];
+
+  for (let el of items) {
+    const itemParent = cache.get(el.parent?._key);
+
+    if (itemParent) {
+      itemParent.children.push(el._key);
+    } else {
+      firstLineKeys.push(el._key);
     }
-  } if (totalPages > 5) {
-    if (currentPage < 4) pageNumbers = [1, 2, 3, '...', totalPages];
-    if (currentPage > 3 && currentPage < totalPages - 2) pageNumbers = [1, '...', currentPage - 1, currentPage, currentPage + 1, '...', totalPages];
-    if (currentPage === 3 && totalPages > 5) pageNumbers = [1, 2, 3, 4, '...', totalPages];
-    if (currentPage === totalPages - 2) pageNumbers = [1, '...', totalPages - 3, totalPages - 2, totalPages - 1, totalPages]
-    if (currentPage > totalPages - 2) pageNumbers = [1, '...', totalPages - 2, totalPages - 1, totalPages]
+    cache.set(el._key, { ...el, children: [] });
   }
-  return pageNumbers.map((item, index) => {
-    if (typeof item === 'number') return <button key={index} className={currentPage === item ? 'Pagination-button active' : 'Pagination-button'} onClick={() => onChange(item)}>{item}</button>
-    else return <p key={index}>...</p>
+
+  const res = [];
+  const createLineTree = (key, combinedKey, deep) => {
+    const item = cache.get(key);
+    res.push({ ...item, combinedKey, prefix: "- ".repeat(deep) });
+    for (let childKey of item.children) {
+      createLineTree(childKey, `${combinedKey}${childKey}`, deep + 1);
+    }
+  };
+
+  Array.from(firstLineKeys).map((key) => {
+    createLineTree(key, key, 0);
   });
+
+  return res.sort((a, b) => a.combinedKey.localeCompare(b.combinedKey));
 };
