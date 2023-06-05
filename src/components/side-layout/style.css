@@ -18,6 +18,9 @@
 
 .SideLayout_side_end {
   justify-content: flex-end;
+  border-bottom: 1px solid #dcdcdc;
+  margin-left: 0px;
+  margin-right: 0px;
 }
 
 .SideLayout_side_between {

@@ -11,8 +11,9 @@ class CategoriesState extends StoreModule {
   async loadCategories() {
     const categRes = await fetch(`/api/v1/categories?fields=*&limit=*`);
     const { result } = await categRes.json();
+    // Взял название категорий из title
     const categories = createCategoryTree(result.items).map((el) => ({
-      title: el.prefix + el.name,
+      title: el.prefix + el.title,
       value: el._id,
     }));
     this.setState(
